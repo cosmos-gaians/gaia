@@ -90,6 +90,9 @@ type GaiaApp struct {
 	keyParams        *sdk.KVStoreKey
 	tkeyParams       *sdk.TransientStoreKey
 
+	// hackatom keys
+	keyDelegation *sdk.KVStoreKey
+
 	// keepers
 	accountKeeper       auth.AccountKeeper
 	feeCollectionKeeper auth.FeeCollectionKeeper
@@ -171,6 +174,12 @@ func NewGaiaApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.stakingKeeper = *stakingKeeper.SetHooks(
 		staking.NewMultiStakingHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()))
+
+	// create delegation keeper
+
+	// create dispatcher
+	// dispatcher := delegate.NewDispatcher()
+	// create group keeper
 
 	app.mm = module.NewManager(
 		genaccounts.NewAppModule(app.accountKeeper),
