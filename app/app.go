@@ -61,6 +61,8 @@ func init() {
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
+		delegation.AppModuleBasic{},
+		group.AppModuleBasic{},
 	)
 
 	config := sdk.GetConfig()
