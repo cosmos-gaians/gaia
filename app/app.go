@@ -274,6 +274,11 @@ func (app *GaiaApp) LoadHeight(height int64) error {
 }
 
 // messages
+// get groups by account address (that I'm a member of)
+// get proposals by group address
+// get group (by address)
+// get proposal (by address)
+// get votes for proposal_id
 // get all contracts
 // get list of  contract ids
 // get contract state by contract id
