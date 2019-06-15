@@ -211,6 +211,8 @@ func NewGaiaApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		mint.NewAppModule(app.mintKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.stakingKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.feeCollectionKeeper, app.distrKeeper, app.accountKeeper),
+		delegation.NewAppModule(app.delegationKeeper),
+		group.NewAppModule(app.groupKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
