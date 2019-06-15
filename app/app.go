@@ -1,6 +1,8 @@
 package app
 
 import (
+	"encoding/binary"
+	"fmt"
 	"io"
 	"os"
 
@@ -18,10 +20,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/genaccounts"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
+	"github.com/cosmos/cosmos-sdk/x/delegation"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	distrclient "github.com/cosmos/cosmos-sdk/x/distribution/client"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	"github.com/cosmos/cosmos-sdk/x/gov"
+	"github.com/cosmos/cosmos-sdk/x/group"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
@@ -58,6 +62,18 @@ func init() {
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 	)
+
+	config := sdk.GetConfig()
+	config.SetAddressVerifier(func(bytes []byte) error {
+		n := len(bytes)
+		if n == sdk.AddrLen {
+			return nil
+		}
+		if n <= binary.MaxVarintLen64+1 {
+			return nil
+		}
+		return fmt.Errorf("unexpected address length %d", n)
+	})
 }
 
 // custom tx codec
@@ -92,6 +108,7 @@ type GaiaApp struct {
 
 	// hackatom keys
 	keyDelegation *sdk.KVStoreKey
+	keyGroup      *sdk.KVStoreKey
 
 	// keepers
 	accountKeeper       auth.AccountKeeper
@@ -104,6 +121,10 @@ type GaiaApp struct {
 	govKeeper           gov.Keeper
 	crisisKeeper        crisis.Keeper
 	paramsKeeper        params.Keeper
+
+	// hackatom keepers
+	delegationKeeper delegation.Keeper
+	groupKeeper      group.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -175,11 +196,9 @@ func NewGaiaApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	app.stakingKeeper = *stakingKeeper.SetHooks(
 		staking.NewMultiStakingHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()))
 
-	// create delegation keeper
-
-	// create dispatcher
-	// dispatcher := delegate.NewDispatcher()
-	// create group keeper
+	// create hackatom keepers
+	app.delegationKeeper = delegation.NewKeeper(app.keyDelegation, app.cdc, app.Router())
+	app.groupKeeper = group.NewKeeper(app.keyGroup, app.cdc, app.accountKeeper, app.delegationKeeper)
 
 	app.mm = module.NewManager(
 		genaccounts.NewAppModule(app.accountKeeper),
