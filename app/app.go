@@ -270,3 +270,16 @@ func (app *GaiaApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci
 func (app *GaiaApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height, app.keyMain)
 }
+
+// messages
+// get groups by account address (that I'm a member of)
+// get proposals by group address
+// get group (by address)
+// get proposal (by address)
+// get votes for proposal_id
+// get all contracts
+// get list of  contract ids
+// get contract state by contract id
+// get contract code by id
+
+// cli/ui to upload contract binary code
