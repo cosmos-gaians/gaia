@@ -30,10 +30,10 @@ func ExampleTxSendSize() {
 	}
 	fee := auth.NewStdFee(gas, coins)
 	signBytes := auth.StdSignBytes("example-chain-ID",
-		1, 1, fee, []sdk.Msg{msg1}, "")
+		1, 1, fee, []sdk.Msg{msg1}, "", nil)
 	sig, _ := priv1.Sign(signBytes)
 	sigs := []auth.StdSignature{{nil, sig}}
-	tx := auth.NewStdTx([]sdk.Msg{msg1}, fee, sigs, "")
+	tx := auth.NewStdTx([]sdk.Msg{msg1}, fee, sigs, "", nil)
 	fmt.Println(len(cdc.MustMarshalBinaryBare([]sdk.Msg{msg1})))
 	fmt.Println(len(cdc.MustMarshalBinaryBare(tx)))
 	// output: 80
