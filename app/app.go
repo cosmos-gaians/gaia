@@ -62,6 +62,9 @@ func init() {
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
+		// delegation.AppModuleBasic{},
+		group.AppModuleBasic{},
+		contract.AppModuleBasic{},
 		//contract.AppModuleBasic{},
 	)
 
