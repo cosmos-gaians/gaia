@@ -213,7 +213,7 @@ func InitTestnet(config *tmconfig.Config, cdc *codec.Codec, mbm module.BasicMana
 		if err != nil {
 			return err
 		}
-		tx := auth.NewStdTx([]sdk.Msg{msg}, auth.StdFee{}, []auth.StdSignature{}, memo)
+		tx := auth.NewStdTx([]sdk.Msg{msg}, auth.StdFee{}, []auth.StdSignature{}, memo, nil)
 		txBldr := auth.NewTxBuilderFromCLI().WithChainID(chainID).WithMemo(memo).WithKeybase(kb)
 
 		signedTx, err := txBldr.SignStdTx(nodeDirName, client.DefaultKeyPass, tx, false)
