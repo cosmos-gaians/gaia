@@ -3,6 +3,7 @@ package app
 import (
 	"encoding/binary"
 	"fmt"
+	"github.com/cosmos/cosmos-sdk/x/contract"
 	"io"
 	"os"
 
@@ -61,6 +62,7 @@ func init() {
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
+		contract.AppModuleBasic{},
 	)
 
 	config := sdk.GetConfig()
@@ -109,6 +111,7 @@ type GaiaApp struct {
 	// hackatom keys
 	keyDelegation *sdk.KVStoreKey
 	keyGroup      *sdk.KVStoreKey
+	keyContract   *sdk.KVStoreKey
 
 	// keepers
 	accountKeeper       auth.AccountKeeper
@@ -125,6 +128,7 @@ type GaiaApp struct {
 	// hackatom keepers
 	delegationKeeper delegation.Keeper
 	groupKeeper      group.Keeper
+	contractKeeper   contract.Keeper
 
 	// the module manager
 	mm *module.Manager
@@ -156,6 +160,9 @@ func NewGaiaApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		keyFeeCollection: sdk.NewKVStoreKey(auth.FeeStoreKey),
 		keyParams:        sdk.NewKVStoreKey(params.StoreKey),
 		tkeyParams:       sdk.NewTransientStoreKey(params.TStoreKey),
+		keyDelegation:    sdk.NewKVStoreKey(delegation.StoreKey),
+		keyGroup:         sdk.NewKVStoreKey(group.StoreKey),
+		keyContract:      sdk.NewKVStoreKey(contract.StoreKey),
 	}
 
 	// init params keeper and subspaces
@@ -199,6 +206,7 @@ func NewGaiaApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	// create hackatom keepers
 	app.delegationKeeper = delegation.NewKeeper(app.keyDelegation, app.cdc, app.Router())
 	app.groupKeeper = group.NewKeeper(app.keyGroup, app.cdc, app.accountKeeper, app.delegationKeeper)
+	app.contractKeeper = contract.NewKeeper(app.keyContract, app.cdc, app.accountKeeper, app.bankKeeper, app.delegationKeeper)
 
 	app.mm = module.NewManager(
 		genaccounts.NewAppModule(app.accountKeeper),
@@ -213,6 +221,7 @@ func NewGaiaApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		staking.NewAppModule(app.stakingKeeper, app.feeCollectionKeeper, app.distrKeeper, app.accountKeeper),
 		delegation.NewAppModule(app.delegationKeeper),
 		group.NewAppModule(app.groupKeeper),
+		contract.NewAppModule(app.contractKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
